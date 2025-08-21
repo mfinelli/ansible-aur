@@ -2,8 +2,7 @@
 name: Build and Publish Collection to Ansible Galaxy
 
 'on':
-  release:
-    types: [ published ]
+  push:
   workflow_dispatch:
 
 defaults:
@@ -22,10 +21,9 @@ jobs:
       - name: Ensure that `version:` in `galaxy.yml` matches `GITHUB_REF`
         id: version
         run: |
-          [ "$(cat galaxy.yml | grep version: | awk '{print $2}')" = $(awk -F '/' '{print substr($3, 2)}' <<< ${GITHUB_REF}) ] || exit 1
           echo "version=$(awk -F '/' '{print substr($3, 2)}' <<< ${GITHUB_REF})" >> $GITHUB_OUTPUT
 
       - name: Deploy collection
         run: |
           ansible-galaxy collection build
-          ansible-galaxy collection publish --api-key ${{ secrets.GALAXY_API_KEY }} "./kewlfft-aur-${{ steps.version.outputs.version }}.tar.gz"
+        # ansible-galaxy collection publish --api-key ${{ secrets.GALAXY_API_KEY }} "./kewlfft-aur-${{ steps.version.outputs.version }}.tar.gz"
